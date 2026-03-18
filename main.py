@@ -153,9 +153,17 @@ class MainWindow(tk.Tk):
 
                 elif Choice == "Button" :
                     
+
+                    # Using list_of_bombs to select only 2 positions of bombs , to put warning image on button
+                    list_of_bombs = []
+                    if len(self.positionRandomBomb[i])>2:
+                        list_of_bombs = random.sample(self.positionRandomBomb[i],2)
+                    else:
+                        list_of_bombs = self.positionRandomBomb[i]
                     
-                    #if  i in list(map(int,self.positionRandomBomb.keys() ) ) and j in self.positionRandomBomb.values() :
-                    if j in self.positionRandomBomb[i] and len(self.positionRandomBomb[i])!=0:  
+                    
+                    if j in list_of_bombs :
+
                         imageB = Image.open("warningIcon.png")
                         imageB = imageB.resize((22,30))
                         # The customtkinter.CTkImage method works like a customizer
