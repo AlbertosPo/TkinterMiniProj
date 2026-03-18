@@ -52,10 +52,13 @@ class MainWindow(tk.Tk):
             The reason for that order , is that "program" tries to put labels under the buttons.
         """        
 
+        self.positionRandomBomb = {}
+
+        self.CreateBombPositions()
 
         # Constructor automatically calls function labelBomb() to create labels with image.
         self.labelBomb()
-
+        
         # Constructor automatically calls function buttonsBox() to create buttons.
         self.buttonsBox()
 
@@ -64,36 +67,47 @@ class MainWindow(tk.Tk):
 
         # Start the main window loop
         # For now it's preferable to mainloop work in MainWindow . 
+        print(f"All bombs {self.positionRandomBomb}")
         self.mainloop()
+        
         #Anything we add to main window after self.mainloop() it doesn't contained.
     
+    def CreateBombPositions(self):
+        self.random12Integers()
+
     def random12Integers(self):
         
-        List_of_Random_numbers = []
-        howManyBombs = random.randint(1,8) # Every line can have 1 to 8 bombs.
-        for _ in range(howManyBombs):
-            random_int = random.randint(0,12) # Initialize a number 0 to 11.
-            List_of_Random_numbers.append(random_int) # This list have got all positions of bombs in every line.
-        
+
+
 
         List_of_Empty_rows = []
         howManyEmptyRows = random.randint(2,6) # Pick random number from 2 to 5
         for _ in range(howManyEmptyRows):
             random_int_for_rows = random.randint(0,12)
             List_of_Empty_rows.append(random_int_for_rows)
+            #List_of_Empty_rows = List_of_Empty_rows.sort()
 
-        # Using set , make list with unique numbers and place them
-        # in order. (But in this case , order doesn't matter )
-        List_of_Random_numbers = list(set(List_of_Empty_rows))
+        # How many bombs in every row
+        List_of_Lists = {} # Include every bomb position in each row
+        #List_of_Random_numbers = []
+        for i in range(12):
+            List_of_Random_numbers = []
+            if i not in List_of_Empty_rows:
+                howManyBombs = random.randint(1,8) # Every line can have 1 to 8 bombs.
+                for _ in range(howManyBombs):
+                    random_int = random.randint(0,12) # Initialize a number 0 to 11.
+                    List_of_Random_numbers.append(random_int) # This list have got all positions of bombs in every line.
+                
+            List_of_Lists.update({i:List_of_Random_numbers})
 
-        return List_of_Random_numbers,List_of_Empty_rows
+        self.positionRandomBomb = List_of_Lists.copy()
+
+         
         
 
     def LoopForButtons_Labels(self,Choice_in):
 
         Choice = Choice_in
-        _ , EmptyRows = self.random12Integers()
-        
         
         RowsAndColumns = 12
         for i in range(RowsAndColumns):
@@ -103,22 +117,23 @@ class MainWindow(tk.Tk):
                 -> If statement that used only in case of label creation.
                 -> As an action , it calls function for list of random numbers
             """
-            if Choice == "Label":
-                randIntList,_ = self.random12Integers()
-
-                            
+     
             for j in range(RowsAndColumns):
                 
                 """
                     -> If statement check if function LoopForButtons_Labels 
                     -> called for buttons or labels creation. 
                 """
-                if Choice=="Label" and i not in EmptyRows:
+                #print(self.positionRandomBomb[i])
+                if Choice=="Label" and len(self.positionRandomBomb[i])!=0 :
                     """
                         ***->   Write explanation of if condition   <-***
                     """
-
-                    if  j in randIntList:
+                    
+                    
+                    if j in list(map(int,self.positionRandomBomb[i])):
+                        print(f"{j} is in {list(map(int,self.positionRandomBomb[i]))}")
+                        
                         image = Image.open("bombIcon.png")  # Replace with your image file path
 
                         # Resizing the image dimansion.
@@ -136,20 +151,22 @@ class MainWindow(tk.Tk):
                         
 
 
-                elif Choice == "Button":
+                elif Choice == "Button" :
                     
-                    if i==j:
+                    
+                    #if  i in list(map(int,self.positionRandomBomb.keys() ) ) and j in self.positionRandomBomb.values() :
+                    if j in self.positionRandomBomb[i] and len(self.positionRandomBomb[i])!=0:  
                         imageB = Image.open("warningIcon.png")
                         imageB = imageB.resize((22,30))
+                        # The customtkinter.CTkImage method works like a customizer
+                        # to make image be used by customtkinter library.
                         ctk_img = customtkinter.CTkImage(imageB,size=imageB.size)
-                        #imageB = imageB.resize((30,32))
 
-                        #imgButton = ImageTk.PhotoImage(imageB)
-                        #imageToButton = imgButton
                         
                         button = customtkinter.CTkButton(master = self
-                                                        ,text = ""
-                                                        , image = ctk_img#imageToButton
+                                                         # text="" makes button to be clear by text.
+                                                        ,text = "" 
+                                                        , image = ctk_img #imageToButton
                                                         , height=35, width=25
                                                         ,fg_color="white"
                                                         )
